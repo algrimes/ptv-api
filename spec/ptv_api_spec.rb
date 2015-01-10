@@ -56,6 +56,8 @@ describe "ptv api" do
     departures = @api.broad_next_departures Stop.new({"stop_id" => 123, "transport_type" => "tram" }), 5
     
     expect(departures[0].platform.stop.transport_type).to be_a(TransportType::Train)
+    expect(departures[0].platform.direction.line.transport_type).to be_a(TransportType::Train)
+    expect(departures[0].run.transport_type).to be_a(TransportType::Train)
     expect(departures[0].time.year).to be(2020)
   end
   
