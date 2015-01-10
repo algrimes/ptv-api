@@ -1,4 +1,4 @@
-class Model::Location
+class Location
   
   attr_reader :lat, :long
   

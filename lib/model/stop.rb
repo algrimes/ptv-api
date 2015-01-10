@@ -1,9 +1,12 @@
-class Model::Stop
+class Stop
   
-  attr_reader :suburb, :transport_type, :location_name, :lat, :long, :stop_id
+  require 'model/transport_type'
+  
+  attr_reader :suburb, :transport_type, :location_name, :location, :stop_id
   
   def initialize(args)
-    @transport_type =  Model::TransportType.from_s args.delete("transport_type")
+    @transport_type =  TransportType.from_s args.delete("transport_type")
+    @location = Location.new(args.delete("lat"), args.delete("long"))
     args.each do |k,v|
       instance_variable_set("@#{k}", v) unless v.nil?
     end
