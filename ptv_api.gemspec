@@ -2,7 +2,7 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "ptv_api"
-  s.version     = 0.01
+  s.version     = '0.0.2'
   s.authors     = ["algrimes"]
   s.email       = [""]
   s.homepage    = "http://www.github.com/algrimes/ptv-api-ruby"
