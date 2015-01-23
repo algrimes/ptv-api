@@ -1,6 +1,6 @@
 class Run
   
-  require 'model/transport_type'
+  require_relative 'transport_type'
   
   attr_reader :transport_type, :run_id, :destination_id, :destination_name
   

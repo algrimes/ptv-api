@@ -1,6 +1,6 @@
 class Line
   
-  require 'model/transport_type'
+  require_relative 'transport_type'
   
   attr_reader :transport_type, :line_id, :line_name, :line_number
   

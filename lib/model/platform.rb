@@ -1,7 +1,7 @@
 class Platform
   
-  require 'model/stop'
-  require 'model/direction'
+  require_relative 'stop'
+  require_relative 'direction'
   
   attr_reader :stop, :direction
   

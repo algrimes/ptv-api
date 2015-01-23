@@ -1,8 +1,8 @@
 class Direction
   
-  require 'model/line'
+  require_relative 'line'
   
-  attr_reader :line, :linedir_id, :direction_name
+  attr_reader :line, :direction_id, :linedir_id, :direction_name
   
   def initialize direction
     @line = Line.new(direction.delete("line"))

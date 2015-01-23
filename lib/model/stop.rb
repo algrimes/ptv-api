@@ -1,7 +1,7 @@
 class Stop
   
-  require 'model/transport_type'
-  require 'model/location'
+  require_relative 'transport_type'
+  require_relative 'location'
   
   attr_reader :suburb, :transport_type, :location_name, :location, :stop_id
   

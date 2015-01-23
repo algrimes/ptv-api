@@ -1,7 +1,7 @@
 class Departure
   
-  require 'model/platform'
-  require 'model/run'
+  require_relative 'platform'
+  require_relative 'run'
   
   attr_reader :platform, :run, :time
   
