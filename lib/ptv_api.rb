@@ -4,6 +4,7 @@ class PTVApi
   require 'openssl'
   require 'json'
   require 'uri'
+  require 'addressable/uri'
   require_relative 'domain/stop'
   require_relative 'domain/departure'
   require_relative 'domain/transport_type'
@@ -21,6 +22,10 @@ class PTVApi
   def stops_near_me location, transport_type=nil
     response = send_request "/v2/nearme/latitude/#{location.lat}/longitude/#{location.long}"
     SearchResults.new(self, response).stops(transport_type)
+  end
+  
+  def lines transport_type, name=nil
+    response = send_request "/v2/lines/mode/#{transport_type}", name ? {:name => name} : {} 
   end
   
   def stops_on_a_line line
@@ -46,12 +51,16 @@ class PTVApi
   end
   
   
-  def send_request path
+  def send_request path, query={}
+    
+    query_builder = Addressable::URI.new
+    query_builder.query_values = { :devid => @dev_id }.merge query
+    
     uri = URI::HTTP.build({ 
       :scheme => "http", 
       :host => "timetableapi.ptv.vic.gov.au", 
       :path => path, 
-      :query => "devid=#{@dev_id}"})
+      :query => query_builder.query})
       
     signature = OpenSSL::HMAC.hexdigest(OpenSSL::Digest::SHA1.new, @key, uri.path + "?" + uri.query)
     uri.query = uri.query + "&signature=#{signature}"
