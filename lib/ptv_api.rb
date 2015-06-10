@@ -25,7 +25,8 @@ class PTVApi
   end
   
   def lines transport_type, name=nil
-    response = send_request "/v2/lines/mode/#{transport_type}", name ? {:name => name} : {} 
+    response = send_request "/v2/lines/mode/#{transport_type}", name ? {:name => name} : {}
+    response.map { |line| Line.new(self, line) }
   end
   
   def stops_on_a_line line
