@@ -3,8 +3,10 @@ class PTVApi
   require 'open-uri'
   require 'openssl'
   require 'json'
-  require_relative 'model/stop'
-  require_relative 'model/departure'
+  require 'uri'
+  require_relative 'domain/stop'
+  require_relative 'domain/departure'
+  require_relative 'domain/transport_type'
   
   
   def initialize dev_id, key
@@ -18,22 +20,31 @@ class PTVApi
   
   def stops_near_me location
     response = send_request "/v2/nearme/latitude/#{location.lat}/longitude/#{location.long}"
-    response.map { |result| Stop.new(result["result"]) }
+    response.map { |result| Stop.new(self, result["result"]) }
+  end
+  
+  def stops_on_a_line line
+    response = send_request "/v2/mode/#{line.transport_type}/line/#{line.line_id}/stops-for-line"
+    response.map { |result| Stop.new(self, result) }
+  end
+  
+  def search name
+    response = send_request "/v2/search/#{URI::escape(name)}"
+    SearchResults.new(self, response)
   end
   
   def broad_next_departures stop, number_of_results=5
-    to_departures(send_request "/v2/mode/#{stop.transport_type.id}/stop/#{stop.stop_id}/departures/by-destination/limit/#{number_of_results}")
+    to_departures(send_request "/v2/mode/#{stop.transport_type}/stop/#{stop.stop_id}/departures/by-destination/limit/#{number_of_results}")
   end
   
   def specific_next_departures stop, direction, number_of_results=5
-    to_departures(send_request "/v2/mode/#{stop.transport_type.id}/line/#{direction.line.line_id}/stop/#{stop.stop_id}/directionid/#{direction.direction_id}/departures/all/limit/#{number_of_results}")
+    to_departures(send_request "/v2/mode/#{stop.transport_type}/line/#{direction.line.line_id}/stop/#{stop.stop_id}/directionid/#{direction.direction_id}/departures/all/limit/#{number_of_results}")
   end
   
   def stopping_pattern departure
-    to_departures(send_request "/v2/mode/#{departure.platform.stop.transport_type.id}/run/#{departure.run.run_id}/stop/#{departure.platform.stop.stop_id}/stopping-pattern")
+    to_departures(send_request "/v2/mode/#{departure.platform.stop.transport_type}/run/#{departure.run.run_id}/stop/#{departure.platform.stop.stop_id}/stopping-pattern")
   end
   
-  private 
   
   def send_request path
     uri = URI::HTTP.build({ 
@@ -48,7 +59,36 @@ class PTVApi
   end
   
   def to_departures response
-    response["values"].map { |departure| Departure.new(departure) }
+    response["values"].map { |departure| Departure.new(self, departure) }
+  end
+  
+  class SearchResults
+    
+    def initialize api, results
+      @api = api
+      @stops, @lines = results.partition { |result| result["type"] == "stop" }
+    end
+    
+    def stops transport_type=nil
+      stops = @stops.map { |stop| Stop.new(@api, stop["result"]) }
+      filter_by_transport_type(stops, transport_type)
+    end
+    
+    def lines transport_type=nil
+      lines = @lines.map { |line| Line.new(@api, line["result"])}
+      filter_by_transport_type(lines, transport_type)
+    end
+    
+    def all
+      self.stops.join self.lines
+    end
+    
+    private 
+    
+    def filter_by_transport_type results, transport_type=nil
+      results.select { |result| transport_type ? (result.transport_type == transport_type) : true }
+    end
+    
   end
   
 end

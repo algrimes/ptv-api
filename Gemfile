@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+gem 'time_difference'
+
 gemspec
 
 group :test do
