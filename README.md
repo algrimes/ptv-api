@@ -46,6 +46,10 @@ and from there query departures:
 
 	results.stops(TransportType::TRAIN)[0].platforms[0].departures
 
+You can also see the stopping pattern:
+
+	results.stops(TransportType::TRAIN)[0].platforms[0].departures[0].stopping_pattern
+
 You can also start with a location, calling stops near me, and going from there:
 
 	Location.new(api, "-23.34234", "44.23123").stops_near_me
