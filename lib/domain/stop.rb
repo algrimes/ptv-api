@@ -8,7 +8,7 @@ class Stop
   def initialize(api, args)
     @api = api
     @transport_type =  TransportType.from_s args["transport_type"]
-    @location = Location.new(args["lat"], args["long"])
+    @location = Location.new(@api, args["lat"], args["long"])
     @suburb = args["suburb"]
     @stop_id = args["stop_id"]
     @location_name = args["location_name"]

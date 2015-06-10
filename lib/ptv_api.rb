@@ -18,9 +18,9 @@ class PTVApi
     send_request "/v2/healthcheck"
   end 
   
-  def stops_near_me location
+  def stops_near_me location, transport_type=nil
     response = send_request "/v2/nearme/latitude/#{location.lat}/longitude/#{location.long}"
-    response.map { |result| Stop.new(self, result["result"]) }
+    SearchResults.new(self, response).stops(transport_type)
   end
   
   def stops_on_a_line line
