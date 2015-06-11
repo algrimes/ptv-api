@@ -18,8 +18,8 @@ class Stop
     @api.broad_next_departures(self)
   end
   
-  def lines
-    @api.broad_next_departures(self).collect { |departure| departure.platform.direction.line }.uniq { |line| line.line_id }
+  def lines_served
+    @api.lines(@transport_type).select { |line| line.stops.any? { |stop| stop.stop_id == @stop_id } }
   end
   
   def platforms
