@@ -77,26 +77,19 @@ class PTVApi
     def initialize api, results
       @api = api
       @stops, @lines = results.partition { |result| result["type"] == "stop" }
+      @matches_transport_type = lambda { |transport_type, result | transport_type ? (result.transport_type == transport_type) : true }
     end
     
     def stops transport_type=nil
-      stops = @stops.map { |stop| Stop.new(@api, stop["result"]) }
-      filter_by_transport_type(stops, transport_type)
+      stops = @stops.map { |stop| Stop.new(@api, stop["result"]) }.select &@matches_transport_type.curry[transport_type]
     end
     
     def lines transport_type=nil
-      lines = @lines.map { |line| Line.new(@api, line["result"])}
-      filter_by_transport_type(lines, transport_type)
+      lines = @lines.map { |line| Line.new(@api, line["result"])}.select &@matches_transport_type.curry[transport_type]
     end
     
     def all
       self.stops.join self.lines
-    end
-    
-    private 
-    
-    def filter_by_transport_type results, transport_type=nil
-      results.select { |result| transport_type ? (result.transport_type == transport_type) : true }
     end
     
   end
